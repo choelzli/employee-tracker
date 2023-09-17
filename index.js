@@ -70,10 +70,10 @@ async function init() {
         // View all employees
         async function viewEmployees() {
             db.query(
-                "SELECT employee.id, employee.first_name, employee.last_name, role.title, department.department_name, role.salary, CONCAT(m.first_name, \' \', m.last_name) AS manager FROM employee e LEFT JOIN employee m ON employee.manager_id = m.id JOIN role ON employee.role_id = role.id JOIN department ON role.department_id = department.id;",
+                "SELECT e.id, e.first_name, e.last_name, role.title, department.department_name, role.salary, CONCAT(m.first_name, \' \', m.last_name) AS manager FROM employee e LEFT JOIN employee m ON e.manager_id = m.id JOIN role ON e.role_id = role.id JOIN department ON role.department_id = department.id;",
                 (err, result) => {
                     console.table(result);
-                    console.error("Query error: view all employees", err);
+                    // console.error("Query error: view all employees", err);
                     init();
                 }
             );
@@ -88,14 +88,14 @@ async function init() {
                 "SELECT title FROM role;",
                 (err, result) => {
                     result.forEach(element => roles.push(element.title));
-                    console.error("Query error: add employee", err);
+                    // console.error("Query error: add employee", err);
                     db.query(
                         "SELECT first_name,last_name FROM employee",
                         (err1, result1) => {
                             result1.forEach(newEmployee => {
                                 managers.push(`${newEmployee.first_name} ${newEmployee.last_name}`);
                             })
-                            console.error("Query error: add new employee's manager", err1);
+                            // console.error("Query error: add new employee's manager", err1);
                             inquirer.prompt
                         }
                     )
@@ -127,7 +127,7 @@ async function init() {
                             db.query(
                                 `INSERT INTO employee (first_name,last_name,role_id,manager_id) VALUES ('${answer.firstName}','${answer.lastName}',${roleId},${managerId})`, 
                                 (err2, result2) => {
-                                    console.error("Query error: updating Employee role", err2);
+                                    // console.error("Query error: updating Employee role", err2);
                                     console.log("Added new employee to the database");
                                     init();
                                 }
@@ -143,7 +143,7 @@ async function init() {
                 "SELECT role.id, role.title, department.department_name, role.salary FROM role JOIN department ON role.department_id = department.id",
                 (err, result) => {
                     console.table(result);
-                    console.error("Query error: view all roles", err);
+                    // console.error("Query error: view all roles", err);
                     init();
                 }
             );
@@ -158,7 +158,7 @@ async function init() {
                     result.forEach(element => {
                         departments.push(element.department_name);
                     })
-                    console.error("Query error: adding new role's department", err);
+                    // console.error("Query error: adding new role's department", err);
                 }
             );
 
@@ -185,7 +185,7 @@ async function init() {
                     db.query(
                         `INSERT INTO role (title, salary, department_id) VALUES ('${answer.title}',${answer.salary},${id});`,
                         (err1, result1) => {
-                            console.error("Query error: adding role to database", err1);
+                            // console.error("Query error: adding role to database", err1);
                             console.log("Added role to the database");
                             init();
                         }
@@ -203,7 +203,7 @@ async function init() {
                 'SELECT concat(employee.first_name,\' \',employee.last_name) as  name, role.title FROM employee JOIN role ON employee.role_id = role.id',
 
                 (err, result) => {
-                    console.error("Query error: joining current role to employeee", err);
+                    // console.error("Query error: joining current role to employeee", err);
                     result.forEach(element => {
                         employees.push(element.name);
 
@@ -234,17 +234,17 @@ async function init() {
                                     role_current = object.title;
                                 }
                             })
-                            .prompt(updateRoleQuestion)
+                            inquirer.prompt(updateRoleQuestion)
                             .then((answer1) => {
                                 db.query(
                                     "SELECT role.id FROM role WHERE role.title = ?",
                                     answer1.roleUpdate,
                                     (err1, result1) => {
-                                        console.error("Query error: cannot find role", err1);
+                                        // console.error("Query error: cannot find role", err1);
                                         db.query(
                                             `UPDATE employee SET role_id=${result1[0].id} WHERE concat(employee.first_name,\' \',employee.last_name) ="${answer1.employeeUpdate}";`, 
                                             (err2, result2) => {
-                                                console.error("Query error: cannot update employee's role", err2);
+                                                // console.error("Query error: cannot update employee's role", err2);
                                                 console.log("Employee's role updated!");
                                                 init();
                                             }
@@ -263,7 +263,7 @@ async function init() {
                 "SELECT * FROM department",
                 (err, result) => {
                     console.table(result);
-                    console.error(err);
+                    // console.error(err);
                     init();
                 }
             );
@@ -283,8 +283,8 @@ async function init() {
                     db.query(
                         `INSERT INTO department (department_name) VALUES ('${answer.name}');`,
                         (err, result) => {
-                            console.log('Department added!');
-                            console.error("Query error: adding new department", err);
+                            console.log(result + ' department added!');
+                            // console.error("Query error: adding new department", err);
                             init();
                         }
                     )
